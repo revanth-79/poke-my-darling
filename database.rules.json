@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "members": {
+      "$pid": {
+        ".read": "auth != null && data.child(auth.uid).exists()",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.val() === true && data.parent().numChildren() < 2"
+        }
+      }
+    },
+    "live": {
+      "$pid": {
+        ".read": "auth != null && root.child('members').child($pid).child(auth.uid).exists()",
+        ".write": "auth != null && root.child('members').child($pid).child(auth.uid).exists()"
+      }
+    }
+  }
+}
