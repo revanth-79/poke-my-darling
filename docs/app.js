@@ -313,7 +313,7 @@ function startData(slowT) {
     S.chatDocs = docs; S.chatLoaded = true;
     const all = allMsgs().msgs; const last = all[all.length - 1];
     if (before >= 0 && all.length > before && last && last.seat !== S.seat) {
-      if (last.k === 'nudge') { sfx('buzz'); document.body.classList.add('buzz'); setTimeout(() => document.body.classList.remove('buzz'), 1000); if (S.tab !== 'chat' || Host.id) toast(`${nm(last.seat)} nudged you 👋`); }
+      if (last.k === 'nudge') { sfx('buzz'); document.body.classList.add('buzz'); setTimeout(() => document.body.classList.remove('buzz'), 1000); if (S.tab !== 'chat' || Host.id) toast(`${nm(last.seat)} poked you 👉`); }
       else if (last.k === 't') { sfx('msg'); if (S.tab !== 'chat' || Host.id) toast(`${nm(last.seat)}: ${(last.t || '').slice(0, 40)}`); }
       else if (last.k === 'inv' && last.gt && Host.id !== last.g) { sfx('pop'); toast(`${nm(last.seat)} challenged you to ${gdef(last.gt).name}`); }
     }
@@ -360,7 +360,7 @@ function renderTop() {
   const top = $('.top'); if (!top) return;
   const ready = S.couple && S.seat;
   top.replaceChildren(h('div', { class: 'wrap' },
-    h('div', { class: 'brand' }, 'Across ', h('span', null, 'Town')),
+    h('div', { class: 'brand' }, 'Poke My ', h('span', null, 'Darling')),
     ready ? h('div', { class: 'pair', title: S.online ? `${nm(op())} is online${S.partnerWhere ? ' · ' + S.partnerWhere : ''}` : `${nm(op())} is away` },
       h('div', { class: 'av ' + me() }, em(me())), h('div', { class: 'heartline' }),
       h('div', { class: 'av ' + op() }, em(op()), h('span', { class: 'dot' + (S.online ? ' on' : '') }))) : null));
@@ -464,7 +464,7 @@ function renderSetup() {
     const na = a.value.trim(), nb = b.value.trim(); if (!na || !nb) { toast('Add both names first'); return; }
     go.disabled = true;
     const body = { p1: { name: na, emoji: pick.a, uid: S.uid || null }, p2: { name: nb, emoji: pick.b, uid: null }, createdAt: Date.now() };
-    try { await dbSet('app/couple', body); S.couple = body; takeSeat('p1'); postEvent('opened Across Town'); } catch { go.disabled = false; }
+    try { await dbSet('app/couple', body); S.couple = body; takeSeat('p1'); postEvent('opened Poke My Darling'); } catch { go.disabled = false; }
   } }, 'Light up the room');
   return h('div', { class: 'wrap setup' },
     heroSvg('🌙', '🌸', 'Two windows, one game room'),
@@ -629,7 +629,7 @@ const Host = {
     } else res.replaceChildren();
     const foot = el.querySelector('.gtools');
     foot.replaceChildren(
-      g.status === 'active' && !needs(g) ? h('button', { class: 'btn small ghost', onclick: () => { sendMsg({ k: 'nudge', g: g.id, t: d.name }); toast('Nudge sent 👋'); sfx('tap'); } }, `Nudge ${nm(op())}`) : null,
+      g.status === 'active' && !needs(g) ? h('button', { class: 'btn small ghost', onclick: () => { sendMsg({ k: 'nudge', g: g.id, t: d.name }); toast('Poke sent 👉'); sfx('tap'); } }, `Poke ${nm(op())} 👉`) : null,
       g.status === 'active' ? h('button', { class: 'btn small ghost', onclick: e => {
         if (!this.armed) { this.armed = true; e.target.textContent = 'Tap again to resign'; setTimeout(() => { this.armed = false; if (e.target.isConnected) e.target.textContent = 'Resign'; }, 3000); return; }
         this.armed = false; resign(g);
@@ -727,7 +727,7 @@ function renderChat(main) {
   const send = async () => { const t = ta.value.trim(); if (!t) return; ta.value = ''; lsSet('at-draft', ''); ta.style.height = 'auto'; await sendMsg({ k: 't', t }); };
   const typing = h('div', { class: 'typing wrap' });
   const compose = h('div', { class: 'compose' }, typing, h('div', { class: 'wrap' },
-    h('button', { class: 'iconbtn', title: `Nudge ${nm(op())}`, 'aria-label': `Nudge ${nm(op())}`, onclick: () => { sendMsg({ k: 'nudge' }); sfx('tap'); } }, '👋'),
+    h('button', { class: 'iconbtn', title: `Poke ${nm(op())}`, 'aria-label': `Poke ${nm(op())}`, onclick: () => { sendMsg({ k: 'nudge' }); sfx('tap'); toast('Poke sent 👉'); } }, '👉'),
     h('button', { class: 'iconbtn', title: 'Send a heart', 'aria-label': 'Send a heart', onclick: () => sendMsg({ k: 't', t: '❤️' }) }, '❤️'),
     ta, h('button', { class: 'iconbtn send', 'aria-label': 'Send', onclick: send, html: ICONS.send })));
   const wrap = h('div', { class: 'chatwrap' }, list, compose);
@@ -746,7 +746,7 @@ function renderChatList(jump) {
   for (const m of msgs) {
     const dk = dayKey(0, m.ts); if (dk !== lastDay) { lastDay = dk; out.push(h('div', { class: 'day' }, dk === dayKey() ? 'Today' : dk === dayKey(-1) ? 'Yesterday' : new Date(m.ts).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }))); }
     const mine = m.seat === me(); const who = mine ? 'You' : nm(m.seat);
-    if (m.k === 'nudge') { out.push(h('div', { class: 'nudge' }, `👋 ${who} nudged ${mine ? nm(op()) : 'you'}${m.t ? ' · ' + m.t : ''}`, h('span', { class: 'faint', style: 'font-weight:700' }, fmtTime(m.ts)))); continue; }
+    if (m.k === 'nudge') { out.push(h('div', { class: 'nudge' }, `👉 ${who} poked ${mine ? nm(op()) : 'you'}${m.t ? ' · ' + m.t : ''}`, h('span', { class: 'faint', style: 'font-weight:700' }, fmtTime(m.ts)))); continue; }
     if (m.k === 'ev' || m.k === 'inv' || m.k === 'res') {
       const g = m.g && S.gameMap[m.g]; const d = g ? gdef(g.type) : m.gt ? gdef(m.gt) : { icon: '✨', tint: '#f6c56c', name: 'a game' };
       let line = `${who} ${m.t}`;

@@ -1,4 +1,4 @@
-// Firebase layer for Across Town. Exposes window.FB with the small API the app uses.
+// Firebase layer for Poke My Darling. Exposes window.FB with the small API the app uses.
 // Firestore holds pairs, games and chat; Realtime Database carries presence and live views.
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
